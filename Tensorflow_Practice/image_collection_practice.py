@@ -12,7 +12,7 @@ number_imgs = 15
 for label in labels:
     os.mkdir 
     {'Tensorflow\workspace\images\collectedimages\\'+label}
-    cap = cv2.VideoCapture(0) #depends on your camera, you can play around with the values
+    cap = cv2.VideoCapture(1) #depends on your camera, you can play around with the values
     print('Collecting images for {}'.format(label))
     time.sleep(5) #sleep for 5 seconds, it will give us time to sleep between images in order to collect img
     for imgnum in range(number_imgs): #loop through the number of images
