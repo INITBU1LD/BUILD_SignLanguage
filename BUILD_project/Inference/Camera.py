@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 import mediapipe as mp
+from Helper import extract_keypoints
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
 def mediapipe_detection(image, model):
@@ -40,6 +41,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         print(results)
         draw_styled_landmarks(image, results) #Draw landmarks
         cv2.imshow('OpenCV Feed', image) #Show to screen
+        data = extract_keypoints(results)
         if cv2.waitKey(10) & 0xFF == ord('q'): #Break gracefully
             break
     cap.release()
