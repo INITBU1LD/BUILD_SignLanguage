@@ -13,10 +13,10 @@ def mediapipe_detection(image, model):
     return image, results
 def draw_styled_landmarks(image, results):
     # Draw face landmarks
-    if results.face_landmarks:
-        mp_drawing.draw_landmarks(image, results.face_landmarks, mp.solutions.holistic.FACEMESH_TESSELATION,
-                                  mp_drawing.DrawingSpec(color=(80, 110, 10), thickness=1, circle_radius=1),
-                                  mp_drawing.DrawingSpec(color=(80, 256, 121), thickness=1, circle_radius=1))
+    #if results.face_landmarks:
+        #mp_drawing.draw_landmarks(image, results.face_landmarks, mp.solutions.holistic.FACEMESH_TESSELATION,
+                                  #mp_drawing.DrawingSpec(color=(80, 110, 10), thickness=1, circle_radius=1),
+                                  #mp_drawing.DrawingSpec(color=(80, 256, 121), thickness=1, circle_radius=1))
     # Draw pose landmarks
     if results.pose_landmarks:
         mp_drawing.draw_landmarks(image, results.pose_landmarks, mp.solutions.holistic.POSE_CONNECTIONS,
