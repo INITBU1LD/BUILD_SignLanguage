@@ -5,16 +5,23 @@ from PIL import Image
 import numpy as np
 import tempfile
 import tensorflow as tf
+import os
+import tflite_runtime.interpreter as tflite
 #from tensorflow.keras.layers import TFSavedModelLayer 
 
 # Load TensorFlow model (adjust path and model loading as necessary)
 # model = TFSavedModelLayer('C:\\Users\\rebec\\Desktop\\build2\\BUILD_SignLanguage\\BUILD_project\\Model\\LSTM', call_endpoint='serving_default')
 
 # Load the TensorFlow SavedModel
-loaded_model = tf.saved_model.load('C:\\Users\\rebec\\Desktop\\build2\\BUILD_SignLanguage\\BUILD_project\\Model\\LSTM.py')
+# LSTM_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'BUILD_project', 'Model','LSTM.py')
+# print(LSTM_PATH)
+LSTM_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'model.tflite')
 
+interpreter = tflite.Interpreter(LSTM_PATH)
+found_signatures = list(interpreter.get_signature_list().keys())
+prediction_fn = interpreter.get_signature_runner("serving_default")
 # Get the inference function from the loaded model
-infer = loaded_model.signatures["serving_default"]
+# infer = interpreter.signatures["serving_default"]
 
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
@@ -43,8 +50,9 @@ A real-time solution for improving communication.""")
 # Setup for webcam capture and image display
 col1, col2 = st.columns([3, 1])
 with col2:
-    sign_language_image = Image.open('C:\\Users\\rebec\\Pictures\\OIP.jpg')
-    st.image(sign_language_image, caption="Try to copy these signs")
+    # sign_language_image = Image.open('C:\\Users\\rebec\\Pictures\\OIP.jpg')
+    # st.image(sign_language_image, caption="Try to copy these signs")
+    pass
 
 # Start/Stop Stream logic
 if st.button('Start Stream', key='start'):
@@ -57,7 +65,7 @@ if st.button('Start Stream', key='start'):
             if not ret:
                 break
 
-            processed_frame = process_frame(frame, holistic, model)
+            processed_frame = process_frame(frame, holistic, loaded_model)
             
             cv2.imwrite(tfile.name, processed_frame)
             col1.image(tfile.name)
