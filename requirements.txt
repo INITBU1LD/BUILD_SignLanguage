@@ -1,0 +1,10 @@
+matplotlib
+numpy
+opencv-python-headless
+scikit_learn
+mediapipe
+tflite
+streamlit
+pandas
+tensorflow
+streamlit_webrtc
