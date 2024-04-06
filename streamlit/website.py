@@ -9,12 +9,14 @@ import os
 import tflite_runtime.interpreter as tflite
 #from tensorflow.keras.layers import TFSavedModelLayer 
 
-# Load TensorFlow model (adjust path and model loading as necessary)
-# model = TFSavedModelLayer('C:\\Users\\rebec\\Desktop\\build2\\BUILD_SignLanguage\\BUILD_project\\Model\\LSTM', call_endpoint='serving_default')
 
-# Load the TensorFlow SavedModel
-# LSTM_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'BUILD_project', 'Model','LSTM.py')
-# print(LSTM_PATH)
+#Load TF Lite Model
+interpreter = tf.lite.Interpreter(model_path="model.tflite")
+found_signatures = list(interpreter.get_signature_list().keys())
+prediction_fn = interpreter.get_signature_runner("serving_default")
+
+
+
 LSTM_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'model.tflite')
 
 interpreter = tflite.Interpreter(LSTM_PATH)
