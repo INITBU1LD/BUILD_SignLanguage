@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # ------------------ Load Models ------------------ #
-
+print("hello")
 # Load TF Lite Model
 interpreter = tf.lite.Interpreter(model_path="weights/model.tflite")
 found_signatures = list(interpreter.get_signature_list().keys())
@@ -25,7 +25,7 @@ train['sign_ord'] = train['sign'].astype('category').cat.codes
 # Dictionaries to translate sign <-> ordinal encoded sign
 SIGN2ORD = train[['sign', 'sign_ord']].set_index('sign').squeeze().to_dict()
 ORD2SIGN = train[['sign_ord', 'sign']].set_index('sign_ord').squeeze().to_dict()
-
+##print(ORD2SIGN)
 # ------------------ Helper Functions ------------------ #
 
 # Function to process the video frame with MediaPipe.
@@ -69,9 +69,11 @@ def extract_keypoints(results):
 frame_keypoints = []
 sentence = []
 frame_count = 0
+word_count = 0
 word = ''
 last_word = None  # Track the last word added to the sentence
-
+pred_frame = 30 #number of frames used to predict
+confidence = 0
 cap = cv2.VideoCapture(0)
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
@@ -81,14 +83,23 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
         keypoints = extract_keypoints(results)
         frame_keypoints.append(keypoints)
-        frame_keypoints = frame_keypoints[-30:]  # Keep only the last 30 frames
+        frame_keypoints = frame_keypoints[-pred_frame:]  # Keep only the last 30 frames
 
         # Make prediction every 30 frames
-        if len(frame_keypoints) == 30:
+        if len(frame_keypoints) == pred_frame:
             res = np.expand_dims(frame_keypoints, axis=0)[0].astype(np.float32)
             prediction = prediction_fn(inputs=res)
+            
             predicted_sign = prediction['outputs'].argmax()
-            word = ORD2SIGN[predicted_sign]  # Current predicted word
+            predictions = prediction['outputs']
+          
+            if (predictions[0][predicted_sign] > .5):
+                ##prints prediction confidence percent
+                print(predictions[0][predicted_sign])
+                print("Adding word")
+                word = ORD2SIGN[predicted_sign]  # Current predicted word
+                confidence = predictions[0][predicted_sign]
+            
 
         # Display the current word
         cv2.putText(image, word, (10,60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
@@ -97,20 +108,30 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         frame_count += 1
 
         # Add word to sentence after a certain number of frames, only if it's different from the last word
-        if frame_count == 90: 
+        if frame_count == pred_frame: 
             if word != last_word:  # Check if the current word is different from the last added word
                 sentence.append(word)
+                out_conf = "{:.2f}".format(confidence)
+                sentence.append(out_conf)
+                word_count = word_count + 1
                 last_word = word  # Update the last word
             frame_count = 0  # Reset frame count
 
         # Join the sentence list to a string and display it
         sentence_text = ' '.join(sentence)
+        
         cv2.putText(image, sentence_text, (10,120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-
+        #resets if word count is 6
+        if(word_count > 6):
+            sentence_text = ''
+            sentence = []
         # Show to screen
         cv2.imshow('OpenCV Feed', image)
-
-        if cv2.waitKey(5) & 0xFF == 27:
+        #Removes text when pressing r
+        if cv2.waitKey(1) & 0xFF == ord('r'):
+            sentence_text = ''
+            sentence = []
+        if cv2.waitKey(1) & 0xFF == 27:
             break
 
 cap.release()
