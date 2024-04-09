@@ -125,6 +125,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         if(word_count > 6):
             sentence_text = ''
             sentence = []
+            word_count = 0
         # Show to screen
         cv2.imshow('OpenCV Feed', image)
         #Removes text when pressing r
