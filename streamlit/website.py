@@ -109,7 +109,26 @@ st.write("Recording status:", "Recording" if is_recording else "Not Recording")
 cap = cv2.VideoCapture(0)
 st_image_placeholder = st.empty()
 
-st.markdown("![Alt Text](https://www.lifeprint.com/asl101/gifs-animated/shhh.gif)")
+st.write("Here are some words you can try:")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    image_url = "https://www.lifeprint.com/asl101/gifs-animated/shhh.gif"
+    width, height = 450, 475  # desired width and height
+
+    html_img = f'<img src="{image_url}" width="{width}" height="{height}">'
+    st.markdown(html_img, unsafe_allow_html=True)
+    st.caption("Shhhh")
+
+with col2:
+    st.markdown("![Alt Text](https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGowNW4zMWE1djZoZm8yNTc0czV0OG45ZndmaWpkeGk2YmdwcXVyMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Jx3bJbEpuZFz3iBWEp/giphy.gif)")
+    st.caption("Water")
+
+with col3:
+    st.markdown("![Alt Text](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeW85ZmVrMXNzY2Jodm5tOGR1cTExeGJuZHRkdjB4Zmlzd2RqbHBjNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MBd09LHGjbdgw4CTtn/giphy.gif)")
+    st.caption("Milk")
+
 
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
