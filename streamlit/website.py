@@ -5,6 +5,10 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+st.set_page_config(
+    layout="wide",  # makes the layout wide
+)
+
 
 # ------------------ Load Models ------------------ #
 # Load TF Lite Model
@@ -99,6 +103,8 @@ st.write("Recording status:", "Recording" if is_recording else "Not Recording")
 
 cap = cv2.VideoCapture(0)
 st_image_placeholder = st.empty()
+
+st.markdown("![Alt Text](https://www.lifeprint.com/asl101/gifs-animated/shhh.gif)")
 
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
