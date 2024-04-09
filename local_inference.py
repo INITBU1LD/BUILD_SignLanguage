@@ -72,8 +72,9 @@ frame_count = 0
 word_count = 0
 word = ''
 last_word = None  # Track the last word added to the sentence
-pred_frame = 30 #number of frames used to predict
-confidence = 0
+pred_frame = 15 #number of frames used to predict
+confidence = 0 #holds current best confidence
+approve_confidence = 0.7 #confidence required to accept word
 cap = cv2.VideoCapture(0)
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
@@ -89,18 +90,18 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         if len(frame_keypoints) == pred_frame:
             res = np.expand_dims(frame_keypoints, axis=0)[0].astype(np.float32)
             prediction = prediction_fn(inputs=res)
-            
+
             predicted_sign = prediction['outputs'].argmax()
             predictions = prediction['outputs']
-          
-            if (predictions[0][predicted_sign] > .5):
+            #confidence = predictions[0][predicted_sign]
+            #word = word + str(confidence)    
+            if (predictions[0][predicted_sign] > approve_confidence):
                 ##prints prediction confidence percent
                 print(predictions[0][predicted_sign])
                 print("Adding word")
                 word = ORD2SIGN[predicted_sign]  # Current predicted word
                 confidence = predictions[0][predicted_sign]
-            
-
+       
         # Display the current word
         cv2.putText(image, word, (10,60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
 
