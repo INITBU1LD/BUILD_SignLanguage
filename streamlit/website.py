@@ -1,3 +1,4 @@
+import time
 import cv2
 import tensorflow as tf
 import mediapipe as mp
@@ -99,7 +100,11 @@ st.write("Recording status:", "Recording" if is_recording else "Not Recording")
 
 cap = cv2.VideoCapture(0)
 st_image_placeholder = st.empty()
+current_word_placeholder = "Current predicted value:"
+current_word_text = st.empty()
 
+current_sentence_placeholder = "Current sentence:"
+current_sentence_text = st.empty()
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
         ret, frame = cap.read()
@@ -119,7 +124,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
         # Display the current word
         cv2.putText(image, word, (10,60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-
+        current_word_text.text(f'Current predicted word: {word}')
         # Increment frame count
         frame_count += 1
 
@@ -133,7 +138,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         # Join the sentence list to a string and display it
         sentence_text = ' '.join(sentence)
         cv2.putText(image, sentence_text, (10,120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-
+        current_sentence_text.text(f'Current sentence: {sentence_text}')
         # Show to screen
         if is_recording:
             # Display the video feed only when recording is active
