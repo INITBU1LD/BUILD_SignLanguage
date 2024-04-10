@@ -129,6 +129,27 @@ with col3:
     st.markdown("![Alt Text](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeW85ZmVrMXNzY2Jodm5tOGR1cTExeGJuZHRkdjB4Zmlzd2RqbHBjNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MBd09LHGjbdgw4CTtn/giphy.gif)")
     st.caption("Milk")
 
+st.info(
+    """Feeling to use more signs? You can select and learn from the list below!\n""")
+word_to_image = {
+    "": "",
+    "aunt": "https://www.lifeprint.com/asl101/gifs/a/aunt.gif",
+    "write": "https://www.lifeprint.com/asl101/gifs/w/write.gif",
+    "who": "https://www.lifeprint.com/asl101/gifs/w/who.gif",
+    "flower": "https://i.makeagif.com/media/11-12-2023/ih9CEI.gif",
+    "bird" : "http://www.lifeprint.com/asl101/gifs/b/bird.gif",
+    "cat" : "http://www.lifeprint.com/asl101/gifs-animated/catanimation.gif",
+    "elephant" : "http://www.lifeprint.com/asl101/gifs-animated/elephant.gif"
+}
+
+# Create the dropdown list
+selected_word = st.selectbox("Select a word", list(word_to_image.keys()))
+
+# Display the corresponding image
+if selected_word:
+    image_file = word_to_image[selected_word]
+    st.markdown(f"![{selected_word.capitalize()}]({image_file})", unsafe_allow_html=True)
+
 
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
