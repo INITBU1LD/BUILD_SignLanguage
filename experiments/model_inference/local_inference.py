@@ -49,16 +49,11 @@ def extract_keypoints(results):
     # Extract landmarks and flatten into a single array, if landmarks are detected otherwise fill with NaN
 
     pose = np.array([[res.x, res.y, res.z] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.full(33*3, np.nan)
-    
     face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.full(468*3, np.nan)
-    
     lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.full(21*3, np.nan)
-    
     rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.full(21*3, np.nan)
-
     # Concatenate all the keypoints into a single flattened array
     all_keypoints = np.concatenate([face, lh, pose, rh])
-
     # Reshape the array
     reshaped_keypoints = np.reshape(all_keypoints, (543, 3))
 
