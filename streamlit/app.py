@@ -13,7 +13,8 @@ from streamlit_pills import pills
 # ------------------------------ Streamlit page configuration ------------------------------ #
 st.set_page_config(
     page_title="SLR",
-    page_icon=":the_horns:"
+    page_icon=":the_horns:",
+    layout="wide",
 )
 st.title("🤘 Sign Language Recognition")
 st.subheader("Powered by :blue[Tensorflow] + :blue[Mediapipe] + :blue[Google Data]")
@@ -96,12 +97,14 @@ def extract_keypoints(results):
 
 # ------------------------------ Streamlit WebRTC ------------------------------ #
 
+col1, col2 = st.columns(2)
+
 class MPVideoProcessor(VideoProcessorBase):
     def __init__(self):
         self.model = mp.solutions.holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5)
         self.frame_keypoints = []
         self.latest_prediction = ""
-        self.confidence_threshold = 0.5  
+        self.confidence_threshold = 0.7  
 
     def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
         img = frame.to_ndarray(format="bgr24")
@@ -131,20 +134,28 @@ class MPVideoProcessor(VideoProcessorBase):
         
         return av.VideoFrame.from_ndarray(img, format="bgr24")
 
+with col1: 
 # Initialize the Streamlit WebRTC component.
-webrtc_streamer(key="mpstream", video_processor_factory=MPVideoProcessor,
-                             video_html_attrs=VideoHTMLAttributes(autoPlay=True, controls=False, style={"width": "100%"}, muted=True))
+    webrtc_streamer(key="mpstream", video_processor_factory=MPVideoProcessor,
+                                video_html_attrs=VideoHTMLAttributes(autoPlay=True, controls=False, style={"width": "100%"}, muted=True))
 
 # ------------------------------ Streamlit Components ------------------------------ #
 
-st.info("Curious about the signs our model recognizes? Explore the dropdown list below.")
-# sorted_signs = sorted(train['sign'].unique())
-sorted_signs = sign_to_webm_path.keys()
-selected_sign = st.selectbox("Select a Sign", sorted_signs)
+with col2:
+    # st.info("Curious about the signs our model recognizes? Explore the dropdown list below.")
+    # sorted_signs = sorted(train['sign'].unique())
+    sorted_signs = sign_to_webm_path.keys()
+    selected_sign = st.selectbox("Select a Sign", sorted_signs)
 
-if selected_sign in sign_to_webm_path:
-    # st.video(sign_to_webm_path[selected_sign])
-    image_file = sign_to_webm_path[selected_sign]
-    st.markdown(f"![{selected_sign.capitalize()}]({image_file})", unsafe_allow_html=True)
-else:
-    st.write("No video available for this sign.")
+    if selected_sign in sign_to_webm_path:
+        # st.video(sign_to_webm_path[selected_sign])
+        image_file = sign_to_webm_path[selected_sign]
+        # st.markdown(f"![{selected_sign.capitalize()}]({image_file})", unsafe_allow_html=True)
+        st.markdown(
+        f"""
+        <img src="{image_file}" style="width: 100%; height: auto">
+        """, 
+        unsafe_allow_html=True
+        )
+    else:
+        st.write("No video available for this sign.")

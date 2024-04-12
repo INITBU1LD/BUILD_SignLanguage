@@ -7,7 +7,7 @@ import pandas as pd
 # ------------------ Load Models ------------------ #
 
 # Load TF Lite Model
-interpreter = tf.lite.Interpreter(model_path="./weights/model.tflite")
+interpreter = tf.lite.Interpreter(model_path="../../weights/model.tflite")
 found_signatures = list(interpreter.get_signature_list().keys())
 prediction_fn = interpreter.get_signature_runner("serving_default")
 
@@ -17,7 +17,7 @@ mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 
 # Add Labels
-train = pd.read_csv('asl-signs/train.csv')
+train = pd.read_csv('../../asl-signs/train.csv')
 
 # Add ordinally Encoded Sign (assign number to each sign name)
 train['sign_ord'] = train['sign'].astype('category').cat.codes
@@ -63,9 +63,8 @@ def extract_keypoints(results):
 # Initialize variables for sentence building and frame count
 frame_keypoints = []
 sentence = []
-frame_count = 0
-word = ''
-last_word = None  # Track the last word added to the sentence
+confidence_threshold = 0.7
+latest_prediction = ''
 
 cap = cv2.VideoCapture(0)
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
@@ -82,25 +81,19 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         if len(frame_keypoints) == 30:
             res = np.expand_dims(frame_keypoints, axis=0)[0].astype(np.float32)
             prediction = prediction_fn(inputs=res)
-            predicted_sign = prediction['outputs'].argmax()
-            word = ORD2SIGN[predicted_sign]  # Current predicted word
+            probabilities = prediction['outputs'][0] 
+            predicted_sign = np.argmax(probabilities)
+            confidence = probabilities[predicted_sign]
+
+            if confidence > confidence_threshold:
+                confidence_pct = int(confidence * 100)  
+                latest_prediction = f"{ORD2SIGN[predicted_sign]} ({confidence_pct}%)"
+            else:
+                latest_prediction = ""
+
 
         # Display the current word
-        cv2.putText(image, word, (10,60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-
-        # Increment frame count
-        frame_count += 1
-
-        # Add word to sentence after a certain number of frames, only if it's different from the last word
-        if frame_count == 90: 
-            if word != last_word:  # Check if the current word is different from the last added word
-                sentence.append(word)
-                last_word = word  # Update the last word
-            frame_count = 0  # Reset frame count
-
-        # Join the sentence list to a string and display it
-        sentence_text = ' '.join(sentence)
-        cv2.putText(image, sentence_text, (10,120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, f"Sign: {latest_prediction}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
 
         # Show to screen
         cv2.imshow('OpenCV Feed', image)
