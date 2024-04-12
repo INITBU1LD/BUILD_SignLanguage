@@ -305,8 +305,6 @@ word_to_image = {
     "zebra" : "https://lifeprint.com/asl101/gifs/z/zebra-stripes-two-hands.gif ",
     "Zipper":"https://th.bing.com/th/id/R.cacf57bbb2001f13e223f45329db5ecb?rik=qPRTVGd2SzUBxw&riu=http%3a%2f%2fwww.babysignlanguage.com%2fsigns%2fzipper.gif&ehk=IGx68sSokNwU21zu3Z2D%2blmeehKYxpSNhX2VnrvQqYE%3d&risl=&pid=ImgRaw&r=0 "
 
-
-
 }
 
 # Create the dropdown list
